@@ -1,10 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>Group Chat</title>
+  </head>
+    <body>
+        <div class="row">
+            <div class="col-xs-6 offset-sm-4">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Your Name</label>
+                    <input type="text" class="form-control" id="name" aria-describedby="name" placeholder="Enter Name">
+                    <small id="emailHelp" class="form-text text-muted">We'll never share your details with anyone else.</small>
+                </div>
+                <button id='sbmt-btn' type="button" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+        <div class="jumbotron" style="margin: 3%;">
+            <ul id="message-list" class="list-group">
+            </ul>
+            <hr class="my-4">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Type Message</span>
+                </div>
+                <textarea id="message-text" class="form-control" aria-label="Type Message"></textarea>
+            </div>
+            <p>
+                <div id="send-msg-btn" class="btn btn-primary btn-lg" role="button">Send Message</div>
+            </p>
+
+            <div class="alert alert-danger" id="error-box" style="display: none;">
+                <strong>Error!</strong>
+            </div>
+        </div>
+        
+    </body>
+</html>
+
+<footer>
 <script src="/socket.io/socket.io.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
 <script>
-  var socket = io('http://localhost:3000');
+    function setCookie(name,value,days) {
+        var expires = "";
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days*24*60*60*1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+    }
+    
+    function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0;i < ca.length;i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1,c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        }
+        return null;
+    }
+
+    $('#sbmt-btn').on('click', function(){
+        setCookie('user-name', $('#name').val());
+    })
+
+    $('#send-msg-btn').on('click', function(){
+        var userName = getCookie('user-name');
+        var messageText = $("#message-text").val();
+        
+        if(! userName){
+            $('#error-box').append('please enter username before sending message');
+            $('#error-box').show();
+        }
+        else if(! messageText){
+            $('#error-box').append('message text is empty');
+            $('#error-box').show();
+        }
+        else{
+            $('#error-box').hide();
+            socket.emit('message send', {'userName': userName, 'messageText': messageText});
+            var messagesLi = '<li class="list-group-item"> Myself > '+messageText+'</li>';
+
+            $('#message-list').append(messagesLi);
+
+            $("#message-text").val('');
+        }
+    })
+
+  var socket = io('https://proud-dragonfly-95.localtunnel.me');
+
+
+  socket.on('message reciept', function(data){
+      var messagesLi = '<li class="list-group-item">'+data['userName']+' > '+data['messageText']+'</li>';
+
+      $('#message-list').append(messagesLi);
+  })
   
-  socket.on('news', function (data) {
-    console.log(data);
-    socket.emit('my other event', { my: 'data' });
-  });
+//   socket.on('news', function (data) {
+//     console.log(data);
+//     socket.emit('my other event', { my: 'data' });
+//   });
+
+//   socket.on('new user', function(){
+//       console.log('Hey!!!! please welcome new user');
+//   });
 
 </script>
+
+</footer>

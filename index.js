@@ -15,12 +15,7 @@ io.on('connection', function (socket) {
     console.log(data);
   });
 
-  socket.on('new-socket', function (data) {
-    console.log('--- new socket emitted event received ----');
-    // socket.emit('my other event', { my: 'data' });
-  });
-
-  setTimeout(() => {
-    socket.emit('news', { after: '1 second' });
-  }, 1000);
+  socket.on('message send', function(data){
+      socket.broadcast.emit('message reciept', data);
+  })
 });
