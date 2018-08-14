@@ -9,19 +9,35 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
     <title>Group Chat</title>
+
+    <style>
+        #message-list{
+            height: 220px;
+            overflow-y: scroll;
+        }
+    </style>
   </head>
     <body>
-        <div class="row">
-            <div class="col-xs-6 offset-sm-4">
-                <div class="form-group">
-                    <label for="exampleInputEmail1">Your Name</label>
-                    <input type="text" class="form-control" id="name" aria-describedby="name" placeholder="Enter Name">
-                    <small id="emailHelp" class="form-text text-muted">We'll never share your details with anyone else.</small>
-                </div>
+        <div class="card w-50 offset-sm-3 text-center">
+            <div class="card-header">
+                WIP: Fast & reliable group chat
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    <div class="form-group">
+                            <input type="text" class="form-control" id="name" aria-describedby="name" placeholder="Enter Name">
+                        </div>
+                </p>
                 <button id='sbmt-btn' type="button" class="btn btn-primary">Submit</button>
             </div>
+            <div class="card-footer text-muted">
+                Note: Your conversations will not be saved
+            </div>
         </div>
+
         <div class="jumbotron" style="margin: 3%;">
+            <p>Group messages </p>
+            <hr class="my-4">
             <ul id="message-list" class="list-group">
             </ul>
             <hr class="my-4">
@@ -71,6 +87,7 @@
 
     $('#sbmt-btn').on('click', function(){
         setCookie('user-name', $('#name').val());
+        $('#name').val('');
     })
 
     $('#send-msg-btn').on('click', function(){
@@ -90,7 +107,7 @@
             socket.emit('message send', {'userName': userName, 'messageText': messageText});
             var messagesLi = '<li class="list-group-item"> Myself > '+messageText+'</li>';
 
-            $('#message-list').append(messagesLi);
+            $('#message-list').prepend(messagesLi);
 
             $("#message-text").val('');
         }
@@ -102,17 +119,8 @@
   socket.on('message reciept', function(data){
       var messagesLi = '<li class="list-group-item">'+data['userName']+' > '+data['messageText']+'</li>';
 
-      $('#message-list').append(messagesLi);
+      $('#message-list').prepend(messagesLi);
   })
-  
-//   socket.on('news', function (data) {
-//     console.log(data);
-//     socket.emit('my other event', { my: 'data' });
-//   });
-
-//   socket.on('new user', function(){
-//       console.log('Hey!!!! please welcome new user');
-//   });
 
 </script>
 
